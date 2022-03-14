@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Read and Write xlsx file</title>
+  </head>
+  <body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="https://unpkg.com/read-excel-file@5.x/bundle/read-excel-file.min.js"></script>
+    <script src="https://unpkg.com/write-excel-file@1.x/bundle/write-excel-file.min.js"></script>
+
+    <script>
+      
+      const schema = [
+        // Column #1
+        {
+          column: "SubscribersKey",
+          type: Number,
+          value: (customer) => customer.subscribersKey,
+        },
+        // Column #2
+        {
+          column: "DateUndeliverable",
+          type: Date,
+          format: "dd/mm/yyyy hh:mm",
+          value: (customer) => customer.dateUndelrverable,
+        },
+        {
+          column: "DateJoining",
+          type: Date,
+          format: "dd/mm/yyyy hh:mm",
+          value: (customer) => customer.dateJoining,
+        },
+        {
+          column: "DateUnsubscribed",
+          type: Date,
+          format: "dd/mm/yyyy hh:mm",
+          value: (customer) => customer.dateUnsubscribed,
+        },
+        // Column #3
+        {
+          column: "Domain",
+          type: String,
+          value: (customer) => customer.domain,
+        },
+        {
+            column: "EmailAddress",
+            type: String,          
+            value: (customer) => customer.emailAddress,
+        },
+        {
+          column: "BounceCounter",
+          type: Number,
+          value: (customer) => customer.bounceCounter,
+        },
+        
+      ];
+      
+
+      let input = document.createElement("INPUT");
+      input.setAttribute("type", "file");
+      document.body.appendChild(input);
+      input.addEventListener("change", function () {
+        readXlsxFile(input.files[0]).then(function (rows) {
+          console.log(rows);
+          let data = [];
+          rows.forEach((element, index) => {
+            console.log("element 2 i", element[1]);
+            let utcDate = new Date(element[1]);
+            utcDate = new Date(
+              utcDate.getUTCFullYear(),
+              utcDate.getUTCMonth(),
+              utcDate.getUTCDate(),
+              utcDate.getUTCHours(),
+              utcDate.getUTCMinutes(),
+              utcDate.getUTCSeconds(),
+              utcDate.getUTCMilliseconds()
+            );
+            //   console.log('element is utc',utcUDate)
+            //   console.log('element is  ',utcDate)
+            if (index > 0) {
+                data.push({
+                subscribersKey: element[0],
+                dateUndelrverable: utcDate,
+                dateJoining: element[2],
+                dateUnsubscribed: element[3],
+                emailAddress: element[4],
+                domain: element[5],
+                bounceCounter: element[6],
+              });
+
+              console.log("datda", data);
+            }
+          });
+          writeXlsxFile(data, {
+            schema,
+            fileName: "file.xlsx",
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
